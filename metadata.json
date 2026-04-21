@@ -1,0 +1,6 @@
+{
+  "name": "Cricket Pro: Multiplayer League",
+  "description": "A physics-based multiplayer cricket game with real-time matchmaking, live data integration, and cloud saves.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}

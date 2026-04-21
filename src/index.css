@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply bg-[#05070a] text-white;
+  }
+}
+
+.bold-gradient-bg {
+  background: radial-gradient(circle at center, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+}
+
+.skew-btn {
+  @apply transform skew-x-[-12deg];
+}
+
+.skew-btn-content {
+  @apply inline-block skew-x-[12deg];
+}

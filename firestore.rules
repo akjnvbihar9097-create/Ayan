@@ -1,0 +1,54 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // 3. Primitive Definition
+    function isValidId(id) { 
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); 
+    }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
+    function isVerified() { return request.auth.token.email_verified == true; }
+
+    // 4. User Collection Rules
+    match /users/{userId} {
+      function isValidUser(data) {
+        return data.userId == request.auth.uid 
+          && data.displayName is string && data.displayName.size() <= 50
+          && data.runs is number && data.runs >= 0
+          && data.wickets is number && data.wickets >= 0
+          && data.matchesPlayed is number && data.matchesPlayed >= 0
+          && data.matchesWon is number && data.matchesWon >= 0
+          && data.updatedAt == request.time;
+      }
+
+      allow get: if isSignedIn();
+      // Pillar 8: Explicitly evaluate resource.data to secure queries
+      allow list: if isSignedIn() && resource.data.runs >= 0; 
+      
+      allow create: if isOwner(userId) && isValidUser(incoming());
+      allow update: if isOwner(userId) && isValidUser(incoming())
+        && incoming().userId == existing().userId; // Immutable ID
+    }
+
+    // 5. GameSave Collection Rules
+    match /saves/{userId} {
+      function isValidSave(data) {
+        return data.userId == request.auth.uid
+          && data.gameState is map
+          && data.updatedAt == request.time;
+      }
+
+      allow get: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidSave(incoming());
+      allow update: if isOwner(userId) && isValidSave(incoming())
+        && incoming().userId == existing().userId;
+    }
+  }
+}

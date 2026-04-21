@@ -1,0 +1,40 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Stores user profile and game statistics.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "displayName": { "type": "string" },
+        "runs": { "type": "number" },
+        "wickets": { "type": "number" },
+        "matchesPlayed": { "type": "number" },
+        "matchesWon": { "type": "number" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "displayName", "runs", "wickets", "matchesPlayed", "matchesWon", "updatedAt"]
+    },
+    "GameSave": {
+      "title": "Cloud Save",
+      "description": "Serialized game state for cloud recovery.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "gameState": { "type": "object" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "gameState", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile data."
+    },
+    "/saves/{userId}": {
+      "schema": "GameSave",
+      "description": "User's cloud save data."
+    }
+  }
+}
